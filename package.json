@@ -1,0 +1,32 @@
+{
+  "name": "event-manager-landing-page",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Event Manager Landing Page with Strapi CMS and Next.js Frontend",
+  "scripts": {
+    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:backend": "cd backend && yarn dev",
+    "dev:frontend": "cd frontend && yarn dev",
+    "build": "yarn build:backend && yarn build:frontend",
+    "build:backend": "cd backend && yarn build",
+    "build:frontend": "cd frontend && yarn build",
+    "start": "concurrently \"yarn start:backend\" \"yarn start:frontend\"",
+    "start:backend": "cd backend && yarn start",
+    "start:frontend": "cd frontend && yarn start",
+    "install:all": "yarn install && cd backend && yarn install && cd ../frontend && yarn install",
+    "clean": "yarn clean:backend && yarn clean:frontend",
+    "clean:backend": "cd backend && rm -rf node_modules dist",
+    "clean:frontend": "cd frontend && rm -rf node_modules .next"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=18.0.0 <=22.x.x",
+    "yarn": ">=1.22.0"
+  }
+}

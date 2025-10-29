@@ -1,0 +1,52 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.iml
+
+# Logs
+**/*.log
+**/npm-debug.log*
+**/yarn-debug.log*
+**/yarn-error.log*
+**/pnpm-debug.log*
+
+# Env files
+**/.env
+**/.env.*
+
+# Dependencies
+**/node_modules/
+
+# Build outputs / caches
+**/dist/
+**/build/
+**/.next/
+**/out/
+**/.turbo/
+**/.cache/
+**/.parcel-cache/
+**/.vercel/
+**/.serverless/
+
+# TypeScript build info
+**/*.tsbuildinfo
+
+# Coverage
+**/coverage/
+
+# Keep important runtime content
+!backend/data/**
+!backend/public/uploads/**
+
+# Allow LFS-managed binaries even if matched elsewhere
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!*.webp
+!*.db
+!*.sqlite
