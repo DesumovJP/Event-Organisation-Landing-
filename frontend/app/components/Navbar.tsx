@@ -9,7 +9,17 @@ const StyledAppBar = styled(AppBar, {
 })<{ isScrolled: boolean }>(({ theme, isScrolled }) => ({
   backgroundColor: isScrolled ? '#fff' : 'transparent',
   boxShadow: isScrolled ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-  transition: 'all 0.3s ease-in-out',
+  transition: 'background-color 0.2s linear, box-shadow 0.2s linear',
+  transform: 'translateZ(0)',
+  willChange: 'background-color, box-shadow',
+  // Запобігаємо розтягуванню та bounce ефекту
+  position: 'fixed',
+  top: 0,
+  left: 0,
+  right: 0,
+  zIndex: 1100,
+  // Фіксована висота - не дозволяємо розтягуватись
+  flexShrink: 0,
 }));
 
 export default function Navbar() {
@@ -17,10 +27,13 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      // Використовуємо requestAnimationFrame для плавної перевірки без пружини
+      requestAnimationFrame(() => {
+        setIsScrolled(window.scrollY > 50);
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -34,6 +47,9 @@ export default function Navbar() {
           justifyContent: 'space-between',
           alignItems: 'center',
           height: { xs: '4rem', sm: '4.5rem', md: '5rem' },
+          minHeight: { xs: '4rem', sm: '4.5rem', md: '5rem' },
+          maxHeight: { xs: '4rem', sm: '4.5rem', md: '5rem' },
+          overflow: 'hidden',
         }}
       >
         {/* Логотип та ім'я зліва */}
@@ -47,7 +63,7 @@ export default function Navbar() {
               height: { xs: '3rem', sm: '3.5rem', md: '4rem' },
               objectFit: 'contain',
               filter: isScrolled ? 'none' : 'brightness(0) invert(1)',
-              transition: 'filter 0.3s ease-in-out',
+              transition: 'filter 0.2s linear',
             }}
           />
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
@@ -58,7 +74,7 @@ export default function Navbar() {
                 fontWeight: 700,
                 color: isScrolled ? '#4A90A4' : 'white',
                 lineHeight: 1.2,
-                transition: 'color 0.3s ease-in-out',
+                transition: 'color 0.2s linear',
               }}
             >
               Соловей Станіслав
@@ -70,7 +86,7 @@ export default function Navbar() {
                 fontWeight: 400,
                 color: isScrolled ? '#666' : 'rgba(255, 255, 255, 0.8)',
                 lineHeight: 1.2,
-                transition: 'color 0.3s ease-in-out',
+                transition: 'color 0.2s linear',
               }}
             >
               Професійний ведучий сучасного формату
@@ -100,7 +116,7 @@ export default function Navbar() {
               fontSize: { xs: '0.875rem', sm: '1rem' },
               fontWeight: 500,
               textTransform: 'none',
-              transition: 'all 0.3s ease-in-out',
+              transition: 'background-color 0.2s linear, border-color 0.2s linear, color 0.2s linear',
               textDecoration: 'none',
               '&:hover': {
                 backgroundColor: isScrolled ? 'rgba(74, 144, 164, 0.8)' : 'rgba(255, 255, 255, 0.1)',

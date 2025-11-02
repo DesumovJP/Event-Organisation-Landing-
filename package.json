@@ -16,7 +16,11 @@
     "install:all": "yarn install && cd backend && yarn install && cd ../frontend && yarn install",
     "clean": "yarn clean:backend && yarn clean:frontend",
     "clean:backend": "cd backend && rm -rf node_modules dist",
-    "clean:frontend": "cd frontend && rm -rf node_modules .next"
+    "clean:frontend": "cd frontend && rm -rf node_modules .next",
+    "dev:npm": "concurrently \"npm run -w backend dev\" \"npm run -w frontend dev\"",
+    "build:npm": "npm run -w backend build && npm run -w frontend build",
+    "start:npm": "concurrently \"npm run -w backend start\" \"npm run -w frontend start\"",
+    "install:all:npm": "npm install --workspaces"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

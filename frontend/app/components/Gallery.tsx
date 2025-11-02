@@ -18,7 +18,6 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import CloseIcon from '@mui/icons-material/Close';
-import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import { request } from 'graphql-request';
 
 interface GalleryImage {
@@ -58,6 +57,15 @@ const GalleryCard = styled(Card)(({ theme }) => ({
     transform: 'translateY(-0.25rem)',
     boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
     borderColor: 'var(--primary-color)',
+    '& .gallery-card-description': {
+      backgroundColor: 'rgba(74, 144, 164, 0.75)',
+    },
+    '& .overlay': {
+      opacity: 1,
+    },
+    '& img': {
+      transform: 'scale(1.05)',
+    },
   },
 }));
 
@@ -70,12 +78,6 @@ const ImageBox = styled(Box)(({ theme }) => ({
     transition: 'transform 0.4s ease',
     willChange: 'transform',
   },
-  '&:hover img': {
-    transform: 'scale(1.05)',
-  },
-  '&:hover .overlay': {
-    opacity: 1,
-  },
 }));
 
 const Overlay = styled(Box)(({ theme }) => ({
@@ -83,7 +85,7 @@ const Overlay = styled(Box)(({ theme }) => ({
   top: 0,
   left: 0,
   right: 0,
-  bottom: 0,
+  bottom: '20%', // Відступ знизу, щоб врахувати висоту бару з описом (~20% висоти картинки)
   backgroundColor: 'rgba(0, 0, 0, 0.3)',
   display: 'flex',
   alignItems: 'center',
@@ -104,7 +106,9 @@ const ModalContent = styled(Box)(({ theme }) => ({
   maxWidth: '100%',
   maxHeight: '90vh',
   boxSizing: 'border-box',
-  overflow: 'auto',
+  overflow: 'hidden',
+  display: 'flex',
+  flexDirection: 'column',
 }));
 
 export default function Gallery() {
@@ -230,7 +234,16 @@ export default function Gallery() {
               <GalleryCard className="gallery-card">
                 <CardActionArea 
                   onClick={() => handleImageClick(image)}
-                  sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+                  sx={{ 
+                    height: '100%', 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    '&:hover': {
+                      '& .gallery-card-description': {
+                        backgroundColor: 'rgba(74, 144, 164, 0.75)',
+                      },
+                    },
+                  }}
                 >
                   <ImageBox>
                     <Box
@@ -255,12 +268,35 @@ export default function Gallery() {
                           justifyContent: 'center',
                         }}
                       >
-                        <ZoomInIcon sx={{ color: 'text.primary', fontSize: { xs: '1.2rem', sm: '1.4rem', md: '1.5rem' } }} />
+                        <Box 
+                          component="svg" 
+                          viewBox="0 0 64 64" 
+                          sx={{ 
+                            width: { xs: 24, sm: 28, md: 32 },
+                            height: { xs: 24, sm: 28, md: 32 },
+                            color: '#4A90A4'
+                          }}
+                        >
+                          <circle cx="28" cy="28" r="18" fill="none" stroke="currentColor" strokeWidth="3" />
+                          <path d="M40 40l12 12" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                        </Box>
                       </Box>
                     </Overlay>
                   </ImageBox>
                   
-                  <CardContent sx={{ p: '5%', position: 'absolute', bottom: 0, left: 0, right: 0, backgroundColor: 'rgba(0, 0, 0, 0.7)', color: 'white' }}>
+                  <CardContent 
+                    sx={{ 
+                      p: '5%', 
+                      position: 'absolute', 
+                      bottom: 0, 
+                      left: 0, 
+                      right: 0, 
+                      backgroundColor: 'rgba(0, 0, 0, 0.7)', 
+                      color: 'white',
+                      transition: 'background-color 0.3s ease-in-out',
+                    }}
+                    className="gallery-card-description"
+                  >
                     <Typography
                       variant="body2"
                       sx={{
@@ -287,19 +323,65 @@ export default function Gallery() {
       >
         <ModalContent>
           {selectedImage && (
-            <Box sx={{ p: '3.75%' }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: '3.75%' }}>
+            <Box sx={{ 
+              p: { xs: 3, md: 4 }, 
+              overflow: 'auto',
+              maxHeight: '90vh',
+              borderRadius: '1rem',
+              scrollbarWidth: 'thin',
+              scrollbarColor: '#ccc transparent',
+              '&::-webkit-scrollbar': {
+                width: '8px',
+              },
+              '&::-webkit-scrollbar-track': {
+                background: 'transparent',
+              },
+              '&::-webkit-scrollbar-thumb': {
+                background: '#ccc',
+                borderRadius: '4px',
+                margin: '4px',
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                background: '#999',
+              },
+              '&::-webkit-scrollbar-corner': {
+                background: 'transparent',
+              },
+            }}>
+              <Box sx={{ 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center', 
+                mb: { xs: 3, md: 4 },
+                pb: { xs: 3, md: 4 },
+                borderBottom: '1px solid rgba(74, 144, 164, 0.1)',
+              }}>
                 <Typography
-                  variant="h6"
+                  variant="h5"
                   sx={{
                     fontWeight: 700,
-                    color: 'text.primary',
-                    fontSize: { xs: '1rem', sm: '1.2rem', md: '1.4rem' }
+                    color: '#4A90A4',
+                    fontSize: { xs: '1.35rem', md: '1.65rem' },
+                    letterSpacing: '0.01em',
+                    lineHeight: 1.2,
                   }}
                 >
                   {selectedImage.name}
                 </Typography>
-                <IconButton onClick={handleCloseModal} size="large">
+                <IconButton 
+                  onClick={handleCloseModal} 
+                  size="medium"
+                  sx={{
+                    color: '#666',
+                    transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    flexShrink: 0,
+                    '&:hover': {
+                      backgroundColor: 'rgba(74, 144, 164, 0.1)',
+                      color: '#4A90A4',
+                      transform: 'rotate(90deg)',
+                    },
+                  }}
+                >
                   <CloseIcon />
                 </IconButton>
               </Box>
@@ -307,9 +389,10 @@ export default function Gallery() {
               <Box
                 sx={{
                   position: 'relative',
-                  borderRadius: '0.5rem',
+                  borderRadius: 0,
                   overflow: 'hidden',
-                  mb: '3.75%',
+                  mb: { xs: 2.5, md: 3 },
+                  backgroundColor: 'transparent',
                 }}
               >
                 {/* Current image */}
@@ -351,71 +434,81 @@ export default function Gallery() {
                 )}
               </Box>
               {/* Thumbnails as rectangular tiles under main image; fixed strip height, centered vertically; inactive are 50% grayscale */}
-              <Box sx={{
-                mt: '2%',
-                display: 'flex',
-                flexWrap: 'nowrap',
-                gap: 1.5,
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 64, // fixed to avoid layout jump
-                overflowX: 'auto',
-                pb: 1,
-                width: '100%',
-                minWidth: 0,
-                scrollbarWidth: 'thin',
-                '&::-webkit-scrollbar': { height: 6 },
-                '&::-webkit-scrollbar-thumb': { backgroundColor: '#bbb', borderRadius: 3 },
-              }}>
-                {selectedImage.img.map((img, i) => {
-                  const isActive = i === selectedIndex;
-                  const tileWidth = isActive ? 64 : 48; // active bigger
-                  const tileHeight = isActive ? 48 : 36;
-                  return (
-                    <Box
-                      key={`${selectedImage.name}-${i}`}
-                      onClick={() => {
-                        if (i === selectedIndex) return;
-                        setPrevIndex(selectedIndex);
-                        setFadeOutPrev(false);
-                        requestAnimationFrame(() => setFadeOutPrev(true));
-                        setSelectedIndex(i);
-                      }}
-                      sx={{
-                        width: tileWidth,
-                        height: tileHeight,
-                        borderRadius: '0.5rem',
-                        overflow: 'hidden',
-                        border: isActive ? '2px solid var(--primary-color)' : '1px solid #ccc',
-                        cursor: 'pointer',
-                        flex: '0 0 auto',
-                        transition: 'all 0.2s ease-in-out',
-                      }}
-                    >
+              {selectedImage.img.length > 1 && (
+                <Box sx={{
+                  mb: { xs: 3, md: 4 },
+                  display: 'flex',
+                  flexWrap: 'nowrap',
+                  gap: 1.5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 72,
+                  overflowX: 'auto',
+                  pb: 1,
+                  width: '100%',
+                  minWidth: 0,
+                  scrollbarWidth: 'thin',
+                  '&::-webkit-scrollbar': { height: 6 },
+                  '&::-webkit-scrollbar-thumb': { backgroundColor: '#bbb', borderRadius: 3 },
+                  '&::-webkit-scrollbar-thumb:hover': { backgroundColor: '#999' },
+                }}>
+                  {selectedImage.img.map((img, i) => {
+                    const isActive = i === selectedIndex;
+                    const tileWidth = isActive ? 72 : 56;
+                    const tileHeight = isActive ? 56 : 44;
+                    return (
                       <Box
-                        component="img"
-                        src={img.url.startsWith('http') ? img.url : `http://localhost:1337${img.url}`}
-                        alt={`${selectedImage.name}-${i}`}
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'cover',
-                          filter: isActive ? 'none' : 'grayscale(1)',
-                          transition: 'filter 0.2s ease-in-out',
+                        key={`${selectedImage.name}-${i}`}
+                        onClick={() => {
+                          if (i === selectedIndex) return;
+                          setPrevIndex(selectedIndex);
+                          setFadeOutPrev(false);
+                          requestAnimationFrame(() => setFadeOutPrev(true));
+                          setSelectedIndex(i);
                         }}
-                      />
-                    </Box>
-                  );
-                })}
-              </Box>
+                        sx={{
+                          width: tileWidth,
+                          height: tileHeight,
+                          borderRadius: '0.5rem',
+                          overflow: 'hidden',
+                          border: isActive ? '2.5px solid #4A90A4' : '1.5px solid #ddd',
+                          cursor: 'pointer',
+                          flex: '0 0 auto',
+                          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                          boxShadow: isActive ? '0 4px 12px rgba(74, 144, 164, 0.25)' : '0 2px 4px rgba(0, 0, 0, 0.1)',
+                          '&:hover': {
+                            borderColor: '#4A90A4',
+                            transform: 'translateY(-2px)',
+                            boxShadow: '0 4px 12px rgba(74, 144, 164, 0.25)',
+                          },
+                        }}
+                      >
+                        <Box
+                          component="img"
+                          src={img.url.startsWith('http') ? img.url : `http://localhost:1337${img.url}`}
+                          alt={`${selectedImage.name}-${i}`}
+                          sx={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            filter: isActive ? 'none' : 'grayscale(0.3) brightness(0.95)',
+                            transition: 'filter 0.3s ease-in-out',
+                          }}
+                        />
+                      </Box>
+                    );
+                  })}
+                </Box>
+              )}
               
               <Typography
-                variant="h6"
+                variant="body1"
                 sx={{
-                  color: '#000',
-                  lineHeight: 1.7,
+                  color: '#333',
+                  lineHeight: 1.85,
                   whiteSpace: 'pre-line',
-                  fontSize: '1.1rem',
+                  fontSize: { xs: '1.05rem', md: '1.2rem' },
+                  fontWeight: 400,
                 }}
               >
                 {getImageDescription(selectedImage)}

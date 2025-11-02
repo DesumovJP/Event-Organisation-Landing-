@@ -11,6 +11,8 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Alert,
+  CircularProgress,
 } from '@mui/material';
 
 export default function Contact() {
@@ -36,10 +38,60 @@ export default function Contact() {
     });
   };
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log('Form submitted:', formData);
-    // Тут буде логіка відправки форми
+    setIsSubmitting(true);
+    setSubmitStatus('idle');
+    setErrors({});
+
+    // Валідація
+    const newErrors: Record<string, string> = {};
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "Ім'я обов'язкове";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email обов\'язковий';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Невірний формат email';
+    }
+    if (!formData.message.trim()) {
+      newErrors.message = 'Повідомлення обов\'язкове';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      setIsSubmitting(false);
+      setSubmitStatus('error');
+      return;
+    }
+
+    // Тут буде логіка відправки форми (інтеграція з API)
+    try {
+      // TODO: Інтегрувати з Strapi API або email service
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Імітація запиту
+      
+      setSubmitStatus('success');
+      setFormData({
+        firstName: '',
+        lastName: '',
+        email: '',
+        inquiry: '',
+        message: '',
+      });
+    } catch (error) {
+      setSubmitStatus('error');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -120,7 +172,17 @@ export default function Contact() {
           </Box>
 
           {/* Right side - Contact form */}
-          <Box>
+          <Box id="contact-section">
+            {submitStatus === 'success' && (
+              <Alert severity="success" sx={{ mb: 3, borderRadius: 0 }}>
+                Дякуємо! Ваше повідомлення відправлено. Ми зв'яжемося з вами найближчим часом.
+              </Alert>
+            )}
+            {submitStatus === 'error' && Object.keys(errors).length === 0 && (
+              <Alert severity="error" sx={{ mb: 3, borderRadius: 0 }}>
+                Виникла помилка при відправці. Спробуйте ще раз або напишіть на email.
+              </Alert>
+            )}
             <form onSubmit={handleSubmit}>
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                 {/* Name fields */}
@@ -142,6 +204,8 @@ export default function Contact() {
                       value={formData.firstName}
                       onChange={handleInputChange('firstName')}
                       required
+                      error={!!errors.firstName}
+                      helperText={errors.firstName}
                       variant="outlined"
                       sx={{
                         flex: 1,
@@ -264,14 +328,16 @@ export default function Contact() {
                   >
                     Email*
                   </Typography>
-                  <TextField
-                    placeholder="info@eventmanager.ua"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange('email')}
-                    required
-                    variant="outlined"
-                    fullWidth
+                    <TextField
+                      placeholder="info@eventmanager.ua"
+                      type="email"
+                      value={formData.email}
+                      onChange={handleInputChange('email')}
+                      required
+                      error={!!errors.email}
+                      helperText={errors.email}
+                      variant="outlined"
+                      fullWidth
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         borderRadius: 0,
@@ -315,6 +381,8 @@ export default function Contact() {
                     value={formData.message}
                     onChange={handleInputChange('message')}
                     required
+                    error={!!errors.message}
+                    helperText={errors.message}
                     variant="outlined"
                     fullWidth
                     sx={{
@@ -344,6 +412,7 @@ export default function Contact() {
                 <Button
                   type="submit"
                   variant="outlined"
+                  disabled={isSubmitting}
                   sx={{
                     alignSelf: 'flex-start',
                     border: '1px solid #ccc',
@@ -354,14 +423,25 @@ export default function Contact() {
                     py: 1,
                     fontSize: '0.9rem',
                     textTransform: 'none',
-                  '&:hover': {
-                    border: '1px solid var(--primary-color)',
-                    bgcolor: 'var(--primary-color)',
-                    color: 'white',
-                  },
+                    minWidth: 120,
+                    '&:hover': {
+                      border: '1px solid var(--primary-color)',
+                      bgcolor: 'var(--primary-color)',
+                      color: 'white',
+                    },
+                    '&:disabled': {
+                      opacity: 0.6,
+                    },
                   }}
                 >
-                  Надіслати
+                  {isSubmitting ? (
+                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                      <CircularProgress size={16} />
+                      Відправка...
+                    </Box>
+                  ) : (
+                    'Надіслати'
+                  )}
                 </Button>
               </Box>
             </form>
