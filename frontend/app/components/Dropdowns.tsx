@@ -54,7 +54,7 @@ const TwoCol = styled(Box)(({ theme }) => ({
 
 const BenefitItem = styled(Box)(({ theme }) => ({
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: theme.spacing(2),
   padding: theme.spacing(2.5, 2.5),
   borderRadius: '12px',
@@ -244,6 +244,7 @@ const BadgesContainer = styled(Box)(({ theme }) => ({
   gap: theme.spacing(1.5, 2),
   marginBottom: theme.spacing(3),
   alignItems: 'center',
+  justifyContent: 'center',
 }));
 
 const QuoteBox = styled(Box)(({ theme }) => ({
